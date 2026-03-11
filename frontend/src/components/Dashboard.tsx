@@ -36,7 +36,7 @@ const CATEGORIES = [
   "Operations & Workforce",
 ];
 
-type DetailTab = "spec" | "diagram" | "devin";
+type DetailTab = "spec" | "diagram" | "implementation";
 
 export default function Dashboard() {
   const [cases, setCases] = useState<HealthcareCase[]>([]);
@@ -180,7 +180,7 @@ export default function Dashboard() {
           {([
             { key: "spec" as DetailTab, label: "Functional Spec" },
             { key: "diagram" as DetailTab, label: "Architecture Diagram" },
-            { key: "devin" as DetailTab, label: "Devin Spec" },
+            { key: "implementation" as DetailTab, label: "Implementation Spec" },
           ]).map((tab) => (
             <button
               key={tab.key}
@@ -200,7 +200,7 @@ export default function Dashboard() {
         <div className="bg-slate-800/50 rounded-xl p-6">
           {detailTab === "spec" && <FunctionalSpec spec={selectedCase.spec} />}
           {detailTab === "diagram" && <ArchDiagram ranked={selectedCase.ranked} />}
-          {detailTab === "devin" && <DevinSpecTab spec={selectedCase.spec} />}
+          {detailTab === "implementation" && <DevinSpecTab spec={selectedCase.spec} />}
         </div>
       </div>
     );

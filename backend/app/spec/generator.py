@@ -35,7 +35,7 @@ def generate_spec(answers: dict, ranked: list[dict]) -> dict:
         "architectureOverview": _get_architecture_overview(primary_id),
         "keyConsiderations": _get_key_considerations(answers, primary_id),
         "nextSteps": _get_next_steps(primary_id),
-        "devinPrompt": _generate_devin_prompt(answers, primary_id, primary_label),
+        "devinPrompt": _generate_implementation_prompt(answers, primary_id, primary_label),
     }
 
     return spec
@@ -186,8 +186,8 @@ def _get_next_steps(arch_id: str) -> list[str]:
     return steps_map.get(arch_id, [])
 
 
-def _generate_devin_prompt(answers: dict, arch_id: str, arch_label: str) -> str:
-    """Generate a Devin-ready implementation prompt."""
+def _generate_implementation_prompt(answers: dict, arch_id: str, arch_label: str) -> str:
+    """Generate an implementation prompt."""
     data_sources = ", ".join(answers.get("dataSources", [])) or "none"
     return (
         f"Build a {arch_label} implementation for: {answers.get('useCaseName', 'Untitled')}. "

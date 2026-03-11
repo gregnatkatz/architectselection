@@ -184,7 +184,7 @@ const DEFAULT_ANSWERS: WizardAnswers = {
 };
 
 type AppView = "dashboard" | "wizard";
-type ResultTab = "spec" | "diagram" | "devin";
+type ResultTab = "spec" | "diagram" | "implementation";
 
 function App() {
   const [view, setView] = useState<AppView>("dashboard");
@@ -397,7 +397,7 @@ function App() {
               [
                 { key: "spec" as ResultTab, label: "Functional Spec" },
                 { key: "diagram" as ResultTab, label: "Architecture Diagram" },
-                { key: "devin" as ResultTab, label: "Devin Spec" },
+                { key: "implementation" as ResultTab, label: "Implementation Spec" },
               ] as const
             ).map((tab) => (
               <button
@@ -418,7 +418,7 @@ function App() {
           <div className="bg-slate-800/50 rounded-xl p-6">
             {activeTab === "spec" && <FunctionalSpec spec={result.spec} />}
             {activeTab === "diagram" && <ArchDiagram ranked={result.ranked} />}
-            {activeTab === "devin" && <DevinSpecTab spec={result.spec} />}
+            {activeTab === "implementation" && <DevinSpecTab spec={result.spec} />}
           </div>
         </div>
       </div>
