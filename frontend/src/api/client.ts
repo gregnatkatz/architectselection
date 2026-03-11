@@ -64,6 +64,28 @@ export interface SpecOutput {
   keyConsiderations: string[];
   nextSteps: string[];
   implementationPrompt: string;
+  whyThisArchitecture?: string;
+  alternativeConsidered?: string;
+  validation?: {
+    status: "validated" | "needs_correction" | "warning";
+    issues: Array<{ severity: string; check: string; message: string; fix: string }>;
+    passed_checks: string[];
+    total_checks: number;
+    pass_rate: number;
+  };
+  requirementsTest?: {
+    simplification_options: Array<{ architecture: string; label: string; viable: boolean; reasoning: string }>;
+    reasons_needs_current: string[];
+    could_simplify: boolean;
+    verdict: string;
+  };
+  corrective?: {
+    action: "none" | "advisory" | "corrected";
+    message: string;
+    original_arch: string;
+    corrected_arch?: string;
+    corrections: Array<{ issue: string; problem: string; fix: string }>;
+  };
 }
 
 export interface Citation {
@@ -193,6 +215,62 @@ export async function fetchAdminStats(): Promise<AdminStats> {
 
 export async function fetchHealthCheck(): Promise<{ status: string; chroma_docs: number; foundry_available: boolean }> {
   const resp = await fetch(`${API_URL}/api/health`, { headers: AUTH_HEADERS });
+  if (!resp.ok) throw new Error(`API error: ${resp.status}`);
+  return resp.json();
+}
+
+export interface ValidationResult {
+  id: string;
+  useCaseName: string;
+  category: string;
+  recommended_arch: string;
+  validation: {
+    overall_status: string;
+    validator: { status: string; issues: Array<{ severity: string; check: string; message: string; fix: string }>; passed_checks: string[]; total_checks: number; pass_rate: number };
+    requirements_test: { simplification_options: Array<{ architecture: string; label: string; viable: boolean; reasoning: string }>; reasons_needs_current: string[]; could_simplify: boolean; verdict: string };
+    corrective: { action: string; message: string; original_arch: string; corrected_arch?: string; corrections: Array<{ issue: string; problem: string; fix: string }> };
+  };
+}
+
+export interface ValidateAllResponse {
+  results: ValidationResult[];
+  stats: { validated: number; warning: number; corrected: number; advisory: number };
+  total: number;
+}
+
+export async function validateAllCases(): Promise<ValidateAllResponse> {
+  const resp = await fetch(`${API_URL}/api/validate-all`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...AUTH_HEADERS },
+  });
+  if (!resp.ok) throw new Error(`API error: ${resp.status}`);
+  return resp.json();
+}
+
+export interface UploadCaseRequest {
+  useCaseName: string;
+  primaryGoal: string;
+  category?: string;
+  complexity?: string;
+  dataSources?: string[];
+  hasPhi?: string;
+  uxChannel?: string;
+  codeCapability?: string;
+  userVolume?: string;
+  realtime?: string;
+  teamSize?: string;
+  agentBehavior?: string;
+  customModel?: string;
+  humanInLoop?: string;
+  description?: string;
+}
+
+export async function uploadCase(req: UploadCaseRequest): Promise<Record<string, unknown>> {
+  const resp = await fetch(`${API_URL}/api/upload-case`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json", ...AUTH_HEADERS },
+    body: JSON.stringify(req),
+  });
   if (!resp.ok) throw new Error(`API error: ${resp.status}`);
   return resp.json();
 }
