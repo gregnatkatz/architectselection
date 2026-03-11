@@ -63,7 +63,14 @@ export interface SpecOutput {
   };
   keyConsiderations: string[];
   nextSteps: string[];
-  devinPrompt: string;
+  implementationPrompt: string;
+}
+
+export interface Citation {
+  text: string;
+  url: string;
+  arch: string;
+  similarity: number;
 }
 
 export interface RecommendResponse {
@@ -72,6 +79,29 @@ export interface RecommendResponse {
   spec: SpecOutput;
   foundry_enhanced: boolean;
   guidance_version: string | null;
+  citations: Citation[];
+}
+
+export interface SSEEvent {
+  status: string;
+  result?: { ranked: ArchResult[]; spec: SpecOutput; citations: Citation[] };
+  enhanced_narrative?: string;
+  reason?: string;
+  msg?: string;
+}
+
+export interface GuidanceStatus {
+  doc_count: number;
+  last_sync: { synced_at: string; sources_synced: number; chunks_added: number } | null;
+}
+
+export interface AdminStats {
+  total_cases: number;
+  feedback: { total: number; correct: number; accuracy: number };
+  architecture_distribution: { arch: string; count: number }[];
+  guidance_sync: GuidanceStatus;
+  chroma_docs: number;
+  foundry_available: boolean;
 }
 
 export async function submitRecommendation(
@@ -85,5 +115,84 @@ export async function submitRecommendation(
   if (!resp.ok) {
     throw new Error(`API error: ${resp.status}`);
   }
+  return resp.json();
+}
+
+export async function streamEnhancedRecommend(
+  answers: WizardAnswers,
+  onEvent: (event: SSEEvent) => void,
+  bearerToken?: string,
+): Promise<void> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    ...AUTH_HEADERS,
+  };
+  if (bearerToken) {
+    headers["Authorization"] = `Bearer ${bearerToken}`;
+  }
+
+  const resp = await fetch(`${API_URL}/api/recommend/enhanced`, {
+    method: "POST",
+    headers,
+    body: JSON.stringify(answers),
+  });
+
+  if (!resp.ok) {
+    throw new Error(`API error: ${resp.status}`);
+  }
+
+  const reader = resp.body?.getReader();
+  if (!reader) throw new Error("No response body");
+
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() || "";
+
+    for (const line of lines) {
+      if (line.startsWith("data: ")) {
+        const data = line.slice(6).trim();
+        if (data === "[DONE]") return;
+        try {
+          const event: SSEEvent = JSON.parse(data);
+          onEvent(event);
+        } catch {
+          // skip malformed events
+        }
+      }
+    }
+  }
+}
+
+export async function fetchGuidanceStatus(): Promise<GuidanceStatus> {
+  const resp = await fetch(`${API_URL}/api/guidance/status`, { headers: AUTH_HEADERS });
+  if (!resp.ok) throw new Error(`API error: ${resp.status}`);
+  return resp.json();
+}
+
+export async function triggerGuidanceSync(): Promise<{ status: string }> {
+  const resp = await fetch(`${API_URL}/api/guidance/sync`, {
+    method: "POST",
+    headers: AUTH_HEADERS,
+  });
+  if (!resp.ok) throw new Error(`API error: ${resp.status}`);
+  return resp.json();
+}
+
+export async function fetchAdminStats(): Promise<AdminStats> {
+  const resp = await fetch(`${API_URL}/api/admin/stats`, { headers: AUTH_HEADERS });
+  if (!resp.ok) throw new Error(`API error: ${resp.status}`);
+  return resp.json();
+}
+
+export async function fetchHealthCheck(): Promise<{ status: string; chroma_docs: number; foundry_available: boolean }> {
+  const resp = await fetch(`${API_URL}/api/health`, { headers: AUTH_HEADERS });
+  if (!resp.ok) throw new Error(`API error: ${resp.status}`);
   return resp.json();
 }

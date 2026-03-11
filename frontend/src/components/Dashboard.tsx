@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Search, Filter, ChevronRight, AlertTriangle, Loader2, X } from "lucide-react";
 import FunctionalSpec from "./FunctionalSpec";
 import ArchDiagram from "./ArchDiagram";
-import DevinSpecTab from "./DevinSpecTab";
+import ImplementationSpecTab from "./ImplementationSpecTab";
 import { API_URL, AUTH_HEADERS } from "../api/client";
 import type { ArchResult, SpecOutput } from "../api/client";
 
@@ -200,7 +200,7 @@ export default function Dashboard() {
         <div className="bg-slate-800/50 rounded-xl p-6">
           {detailTab === "spec" && <FunctionalSpec spec={selectedCase.spec} />}
           {detailTab === "diagram" && <ArchDiagram ranked={selectedCase.ranked} />}
-          {detailTab === "implementation" && <DevinSpecTab spec={selectedCase.spec} />}
+          {detailTab === "implementation" && <ImplementationSpecTab spec={selectedCase.spec} />}
         </div>
       </div>
     );
