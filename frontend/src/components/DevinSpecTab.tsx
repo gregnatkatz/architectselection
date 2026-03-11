@@ -21,7 +21,7 @@ export default function DevinSpecTab({ spec }: DevinSpecTabProps) {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-          <Terminal size={20} /> Devin Implementation Prompt
+          <Terminal size={20} /> Implementation Prompt
         </h3>
         <button
           onClick={copyPrompt}
@@ -34,7 +34,7 @@ export default function DevinSpecTab({ spec }: DevinSpecTabProps) {
 
       <div className="bg-slate-800 rounded-lg p-6">
         <p className="text-sm text-slate-400 mb-4">
-          Copy this prompt and paste it into a new Devin session to begin implementation:
+          Copy this prompt to begin implementation:
         </p>
         <div className="bg-slate-900 rounded-lg p-4 border border-slate-700">
           <pre className="text-sm text-green-400 whitespace-pre-wrap font-mono leading-relaxed">

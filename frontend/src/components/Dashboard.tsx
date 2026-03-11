@@ -3,9 +3,8 @@ import { Search, Filter, ChevronRight, AlertTriangle, Loader2, X } from "lucide-
 import FunctionalSpec from "./FunctionalSpec";
 import ArchDiagram from "./ArchDiagram";
 import DevinSpecTab from "./DevinSpecTab";
+import { API_URL, AUTH_HEADERS } from "../api/client";
 import type { ArchResult, SpecOutput } from "../api/client";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 interface HealthcareCase {
   id: string;
@@ -37,7 +36,7 @@ const CATEGORIES = [
   "Operations & Workforce",
 ];
 
-type DetailTab = "spec" | "diagram" | "devin";
+type DetailTab = "spec" | "diagram" | "implementation";
 
 export default function Dashboard() {
   const [cases, setCases] = useState<HealthcareCase[]>([]);
@@ -55,7 +54,19 @@ export default function Dashboard() {
 
   const fetchCases = async () => {
     try {
-      const resp = await fetch(`${API_URL}/api/healthcare-cases`);
+      // Try static pre-generated file first (works without backend)
+      const staticResp = await fetch("/healthcare-cases.json");
+      if (staticResp.ok) {
+        const data = await staticResp.json();
+        setCases(data.cases);
+        setLoading(false);
+        return;
+      }
+    } catch {
+      // Static file not available, fall through to API
+    }
+    try {
+      const resp = await fetch(`${API_URL}/api/healthcare-cases`, { headers: AUTH_HEADERS });
       if (!resp.ok) throw new Error(`API error: ${resp.status}`);
       const data = await resp.json();
       setCases(data.cases);
@@ -169,7 +180,7 @@ export default function Dashboard() {
           {([
             { key: "spec" as DetailTab, label: "Functional Spec" },
             { key: "diagram" as DetailTab, label: "Architecture Diagram" },
-            { key: "devin" as DetailTab, label: "Devin Spec" },
+            { key: "implementation" as DetailTab, label: "Implementation Spec" },
           ]).map((tab) => (
             <button
               key={tab.key}
@@ -189,7 +200,7 @@ export default function Dashboard() {
         <div className="bg-slate-800/50 rounded-xl p-6">
           {detailTab === "spec" && <FunctionalSpec spec={selectedCase.spec} />}
           {detailTab === "diagram" && <ArchDiagram ranked={selectedCase.ranked} />}
-          {detailTab === "devin" && <DevinSpecTab spec={selectedCase.spec} />}
+          {detailTab === "implementation" && <DevinSpecTab spec={selectedCase.spec} />}
         </div>
       </div>
     );

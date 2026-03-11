@@ -1,4 +1,23 @@
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
+// Parse API URL - extract credentials if embedded in URL for Basic auth
+function parseApiConfig() {
+  const raw = import.meta.env.VITE_API_URL || "http://localhost:8000";
+  try {
+    const url = new URL(raw);
+    if (url.username) {
+      const creds = btoa(`${url.username}:${url.password}`);
+      url.username = "";
+      url.password = "";
+      return { url: url.origin + url.pathname.replace(/\/$/, ""), headers: { Authorization: `Basic ${creds}` } };
+    }
+    return { url: raw.replace(/\/$/, ""), headers: {} as Record<string, string> };
+  } catch {
+    return { url: raw.replace(/\/$/, ""), headers: {} as Record<string, string> };
+  }
+}
+
+const { url: API_URL, headers: AUTH_HEADERS } = parseApiConfig();
+
+export { API_URL, AUTH_HEADERS };
 
 export interface WizardAnswers {
   useCaseName: string;
@@ -60,7 +79,7 @@ export async function submitRecommendation(
 ): Promise<RecommendResponse> {
   const resp = await fetch(`${API_URL}/api/recommend`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...AUTH_HEADERS },
     body: JSON.stringify(answers),
   });
   if (!resp.ok) {
