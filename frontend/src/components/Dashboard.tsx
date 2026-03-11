@@ -3,9 +3,8 @@ import { Search, Filter, ChevronRight, AlertTriangle, Loader2, X } from "lucide-
 import FunctionalSpec from "./FunctionalSpec";
 import ArchDiagram from "./ArchDiagram";
 import DevinSpecTab from "./DevinSpecTab";
+import { API_URL, AUTH_HEADERS } from "../api/client";
 import type { ArchResult, SpecOutput } from "../api/client";
-
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 interface HealthcareCase {
   id: string;
@@ -55,7 +54,7 @@ export default function Dashboard() {
 
   const fetchCases = async () => {
     try {
-      const resp = await fetch(`${API_URL}/api/healthcare-cases`);
+      const resp = await fetch(`${API_URL}/api/healthcare-cases`, { headers: AUTH_HEADERS });
       if (!resp.ok) throw new Error(`API error: ${resp.status}`);
       const data = await resp.json();
       setCases(data.cases);
