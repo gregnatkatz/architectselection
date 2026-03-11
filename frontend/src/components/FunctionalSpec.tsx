@@ -1,4 +1,4 @@
-import { FileText, Copy, Check } from "lucide-react";
+import { FileText, Copy, Check, Zap } from "lucide-react";
 import { useState } from "react";
 import type { SpecOutput } from "../api/client";
 
@@ -108,6 +108,33 @@ export default function FunctionalSpec({ spec }: FunctionalSpecProps) {
                 <li key={i} className="text-slate-300 bg-red-900/20 border border-red-800/50 rounded p-3 text-sm">{c}</li>
               ))}
             </ul>
+          </div>
+        )}
+
+        {/* AI Lightning Optimization (MS Research) */}
+        {spec.aiLightning && spec.aiLightning.applicable && (
+          <div className="bg-gradient-to-r from-amber-900/20 to-orange-900/20 border border-amber-700/50 rounded-lg p-5">
+            <h5 className="text-sm font-semibold text-amber-300 uppercase tracking-wider mb-3 flex items-center gap-2">
+              <Zap size={14} className="text-amber-400" /> {spec.aiLightning.framework}
+            </h5>
+            <p className="text-sm text-slate-300 mb-4">{spec.aiLightning.summary}</p>
+            {spec.aiLightning.optimizationPaths.length > 0 && (
+              <div className="space-y-3 mb-4">
+                <div className="text-xs text-slate-500 uppercase tracking-wider font-semibold">Optimization Paths</div>
+                {spec.aiLightning.optimizationPaths.map((path, i) => (
+                  <div key={i} className="bg-amber-900/20 border border-amber-800/40 rounded-lg p-3">
+                    <div className="text-sm font-medium text-amber-200 mb-1">{path.name}</div>
+                    <p className="text-xs text-slate-400">{path.description}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+            {spec.aiLightning.trainingStrategy && (
+              <div>
+                <div className="text-xs text-slate-500 uppercase tracking-wider font-semibold mb-1">Training Strategy</div>
+                <p className="text-xs text-slate-400">{spec.aiLightning.trainingStrategy}</p>
+              </div>
+            )}
           </div>
         )}
 

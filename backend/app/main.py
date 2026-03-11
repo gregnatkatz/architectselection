@@ -119,6 +119,10 @@ class UploadCaseRequest(BaseModel):
     humanInLoop: str = "no"
     description: str = ""
 
+class AnalyzeDocumentRequest(BaseModel):
+    content: str
+    filename: str = ""
+
 class CustomDocRequest(BaseModel):
     url: str
     title: str = ""
@@ -515,6 +519,73 @@ async def upload_case(req: UploadCaseRequest):
         "confidence": primary.get("confidence", 0.0),
         "score": primary.get("score", 0),
         "validation": pipeline_result,
+    }
+
+
+# ─── Document Analysis ────────────────────────────────────────────
+
+@app.post("/api/analyze-document")
+async def analyze_document(req: AnalyzeDocumentRequest):
+    """Analyze an uploaded document and extract architecture-relevant insights."""
+    content = req.content[:10000]  # Limit input size
+    filename = req.filename or "untitled"
+
+    # Simple keyword-based analysis for architecture signals
+    content_lower = content.lower()
+    signals = []
+    arch_mentions = {
+        "copilot_studio": ["copilot studio", "power virtual agents", "low-code bot", "teams bot"],
+        "agent_builder": ["agent builder", "m365 copilot", "declarative agent", "sharepoint grounding"],
+        "fabric_agent": ["fabric", "onelake", "lakehouse", "data pipeline", "power bi"],
+        "foundry_agent": ["foundry", "azure ai", "hipaa", "phi", "multi-agent", "custom model"],
+    }
+    detected_archs = []
+    for arch, keywords in arch_mentions.items():
+        for kw in keywords:
+            if kw in content_lower:
+                detected_archs.append(arch)
+                signals.append(f"Detected '{kw}' — relevant to {arch.replace('_', ' ').title()}")
+                break
+
+    # Check for compliance signals
+    if any(w in content_lower for w in ["hipaa", "phi", "protected health", "baa"]):
+        signals.append("COMPLIANCE: Document references PHI/HIPAA — Azure AI Foundry required")
+    if any(w in content_lower for w in ["real-time", "realtime", "streaming"]):
+        signals.append("REAL-TIME: Document mentions real-time processing requirements")
+    if any(w in content_lower for w in ["snowflake", "databricks", "external data"]):
+        signals.append("EXTERNAL DATA: Document references external data platforms")
+
+    word_count = len(content.split())
+    summary = (
+        f"Analyzed '{filename}' ({word_count} words). "
+        f"Found {len(signals)} architecture-relevant signals. "
+    )
+    if detected_archs:
+        summary += f"Relevant architectures: {', '.join(set(detected_archs))}. "
+    if not signals:
+        summary += "No strong architecture signals detected — consider running through the wizard for detailed analysis."
+    else:
+        summary += "Signals: " + "; ".join(signals[:5])
+
+    # Index into ChromaDB if available
+    indexed = False
+    try:
+        collection = get_collection()
+        collection.add(
+            documents=[content[:2000]],
+            metadatas=[{"source": filename, "type": "uploaded_document"}],
+            ids=[f"doc-{hash(content[:500]) % 100000}"]
+        )
+        indexed = True
+    except Exception:
+        pass
+
+    return {
+        "summary": summary,
+        "signals": signals,
+        "detected_architectures": list(set(detected_archs)),
+        "word_count": word_count,
+        "indexed": indexed,
     }
 
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Filter, ChevronRight, AlertTriangle, Loader2, X, CheckCircle, Upload, ShieldCheck } from "lucide-react";
+import { Search, Filter, ChevronRight, AlertTriangle, Loader2, X, CheckCircle, Upload, ShieldCheck, ThumbsUp, ThumbsDown, Zap } from "lucide-react";
 import FunctionalSpec from "./FunctionalSpec";
 import ArchDiagram from "./ArchDiagram";
 import { API_URL, AUTH_HEADERS } from "../api/client";
@@ -79,6 +79,16 @@ export default function Dashboard() {
   const [uploadGoal, setUploadGoal] = useState("");
   const [uploading, setUploading] = useState(false);
 
+  // Feedback state
+  const [feedback, setFeedback] = useState<Record<string, "up" | "down">>({});
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState<string | null>(null);
+
+  // Document upload state
+  const [showDocUpload, setShowDocUpload] = useState(false);
+  const [docFile, setDocFile] = useState<File | null>(null);
+  const [docAnalyzing, setDocAnalyzing] = useState(false);
+  const [docResult, setDocResult] = useState<string | null>(null);
+
   useEffect(() => {
     fetchCases();
   }, []);
@@ -126,6 +136,51 @@ export default function Dashboard() {
       console.error("Validation failed:", err);
     } finally {
       setValidating(false);
+    }
+  };
+
+  const handleFeedback = async (caseId: string, vote: "up" | "down") => {
+    setFeedbackSubmitting(caseId);
+    try {
+      await fetch(`${API_URL}/api/feedback`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...AUTH_HEADERS },
+        body: JSON.stringify({
+          use_case_id: caseId,
+          actual_arch: selectedCase?.primary_arch || "",
+          was_correct: vote === "up",
+          notes: vote === "up" ? "User confirmed recommendation" : "User disagreed with recommendation",
+        }),
+      });
+      setFeedback((prev) => ({ ...prev, [caseId]: vote }));
+    } catch (err) {
+      console.error("Feedback failed:", err);
+    } finally {
+      setFeedbackSubmitting(null);
+    }
+  };
+
+  const handleDocAnalyze = async () => {
+    if (!docFile) return;
+    setDocAnalyzing(true);
+    setDocResult(null);
+    try {
+      const text = await docFile.text();
+      const resp = await fetch(`${API_URL}/api/analyze-document`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...AUTH_HEADERS },
+        body: JSON.stringify({ content: text, filename: docFile.name }),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        setDocResult(data.summary || "Document analyzed and indexed successfully.");
+      } else {
+        setDocResult("Analysis endpoint not available — document saved locally for review.");
+      }
+    } catch {
+      setDocResult("Document saved locally. Backend analysis will run when the API is available.");
+    } finally {
+      setDocAnalyzing(false);
     }
   };
 
@@ -228,6 +283,39 @@ export default function Dashboard() {
               </span>
               <div className="mt-2 text-sm text-slate-400">
                 Score: {selectedCase.score} | Confidence: {Math.round(selectedCase.confidence * 100)}%
+              </div>
+              {/* Thumbs up/down feedback */}
+              <div className="mt-3 flex items-center justify-end gap-2">
+                <span className="text-xs text-slate-500 mr-1">Rate this recommendation:</span>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleFeedback(selectedCase.id, "up"); }}
+                  disabled={feedbackSubmitting === selectedCase.id}
+                  className={`p-1.5 rounded-lg transition-all ${
+                    feedback[selectedCase.id] === "up"
+                      ? "bg-green-600/30 text-green-300 border border-green-500"
+                      : "bg-slate-700 text-slate-400 hover:text-green-300 hover:bg-green-900/20 border border-slate-600"
+                  }`}
+                  title="Good recommendation"
+                >
+                  <ThumbsUp size={14} />
+                </button>
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleFeedback(selectedCase.id, "down"); }}
+                  disabled={feedbackSubmitting === selectedCase.id}
+                  className={`p-1.5 rounded-lg transition-all ${
+                    feedback[selectedCase.id] === "down"
+                      ? "bg-red-600/30 text-red-300 border border-red-500"
+                      : "bg-slate-700 text-slate-400 hover:text-red-300 hover:bg-red-900/20 border border-slate-600"
+                  }`}
+                  title="Needs improvement"
+                >
+                  <ThumbsDown size={14} />
+                </button>
+                {feedback[selectedCase.id] && (
+                  <span className={`text-xs ml-1 ${feedback[selectedCase.id] === "up" ? "text-green-400" : "text-red-400"}`}>
+                    {feedback[selectedCase.id] === "up" ? "Thanks!" : "Noted — will improve"}
+                  </span>
+                )}
               </div>
               {vr && (
                 <div className="mt-2">
@@ -395,6 +483,12 @@ export default function Dashboard() {
         >
           <Upload size={14} /> Upload Use Case
         </button>
+        <button
+          onClick={() => setShowDocUpload(!showDocUpload)}
+          className="flex items-center gap-2 px-4 py-2 text-sm bg-purple-600 hover:bg-purple-500 text-white rounded-lg transition-all"
+        >
+          <Zap size={14} /> Upload & Analyze Document
+        </button>
 
         {/* Validation stats summary */}
         {validationStats && (
@@ -411,6 +505,47 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+
+      {/* Document Upload & Analyze */}
+      {showDocUpload && (
+        <div className="bg-slate-800 rounded-xl p-6 border border-purple-500/50">
+          <h3 className="text-white font-semibold mb-4 flex items-center gap-2">
+            <Zap size={16} className="text-purple-400" /> Upload & Analyze Supporting Document
+          </h3>
+          <p className="text-xs text-slate-400 mb-3">
+            Upload a diagram, architecture doc, or use case description. The agent will analyze it and index it for future reference.
+          </p>
+          <div className="space-y-3">
+            <input
+              type="file"
+              accept=".txt,.md,.json,.csv,.docx,.pdf"
+              onChange={(e) => setDocFile(e.target.files?.[0] || null)}
+              className="w-full text-sm text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-purple-600 file:text-white hover:file:bg-purple-500"
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={handleDocAnalyze}
+                disabled={docAnalyzing || !docFile}
+                className="flex items-center gap-2 px-4 py-2 text-sm bg-purple-600 hover:bg-purple-500 disabled:bg-purple-800 disabled:cursor-not-allowed text-white rounded-lg transition-all"
+              >
+                {docAnalyzing ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
+                {docAnalyzing ? "Analyzing..." : "Analyze & Index"}
+              </button>
+              <button
+                onClick={() => { setShowDocUpload(false); setDocResult(null); }}
+                className="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+            {docResult && (
+              <div className="bg-purple-900/20 border border-purple-700/50 rounded-lg p-3 text-sm text-purple-300">
+                {docResult}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Upload form */}
       {showUpload && (

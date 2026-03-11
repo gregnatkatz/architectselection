@@ -66,6 +66,13 @@ export interface SpecOutput {
   implementationPrompt: string;
   whyThisArchitecture?: string;
   alternativeConsidered?: string;
+  aiLightning?: {
+    applicable: boolean;
+    framework: string;
+    summary: string;
+    optimizationPaths: Array<{ name: string; description: string }>;
+    trainingStrategy: string;
+  };
   validation?: {
     status: "validated" | "needs_correction" | "warning";
     issues: Array<{ severity: string; check: string; message: string; fix: string }>;
