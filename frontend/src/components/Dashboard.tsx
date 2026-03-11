@@ -54,6 +54,18 @@ export default function Dashboard() {
 
   const fetchCases = async () => {
     try {
+      // Try static pre-generated file first (works without backend)
+      const staticResp = await fetch("/healthcare-cases.json");
+      if (staticResp.ok) {
+        const data = await staticResp.json();
+        setCases(data.cases);
+        setLoading(false);
+        return;
+      }
+    } catch {
+      // Static file not available, fall through to API
+    }
+    try {
       const resp = await fetch(`${API_URL}/api/healthcare-cases`, { headers: AUTH_HEADERS });
       if (!resp.ok) throw new Error(`API error: ${resp.status}`);
       const data = await resp.json();
