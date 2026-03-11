@@ -35,7 +35,7 @@ def generate_spec(answers: dict, ranked: list[dict]) -> dict:
         "architectureOverview": _get_architecture_overview(primary_id),
         "keyConsiderations": _get_key_considerations(answers, primary_id),
         "nextSteps": _get_next_steps(primary_id),
-        "devinPrompt": _generate_implementation_prompt(answers, primary_id, primary_label),
+        "implementationPrompt": _generate_implementation_prompt(answers, primary_id, primary_label),
     }
 
     return spec

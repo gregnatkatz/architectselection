@@ -3,7 +3,7 @@ import { AlertTriangle, RotateCcw, Loader2, LayoutDashboard, Wand2 } from "lucid
 import WizardStep from "./components/WizardStep";
 import FunctionalSpec from "./components/FunctionalSpec";
 import ArchDiagram from "./components/ArchDiagram";
-import DevinSpecTab from "./components/DevinSpecTab";
+import ImplementationSpecTab from "./components/ImplementationSpecTab";
 import Dashboard from "./components/Dashboard";
 import { submitRecommendation } from "./api/client";
 import type { WizardAnswers, RecommendResponse } from "./api/client";
@@ -418,7 +418,7 @@ function App() {
           <div className="bg-slate-800/50 rounded-xl p-6">
             {activeTab === "spec" && <FunctionalSpec spec={result.spec} />}
             {activeTab === "diagram" && <ArchDiagram ranked={result.ranked} />}
-            {activeTab === "implementation" && <DevinSpecTab spec={result.spec} />}
+            {activeTab === "implementation" && <ImplementationSpecTab spec={result.spec} />}
           </div>
         </div>
       </div>

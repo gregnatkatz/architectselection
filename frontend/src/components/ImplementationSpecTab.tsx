@@ -2,14 +2,14 @@ import { Copy, Check, Terminal } from "lucide-react";
 import { useState } from "react";
 import type { SpecOutput } from "../api/client";
 
-interface DevinSpecTabProps {
+interface ImplementationSpecTabProps {
   spec: SpecOutput;
 }
 
-export default function DevinSpecTab({ spec }: DevinSpecTabProps) {
+export default function ImplementationSpecTab({ spec }: ImplementationSpecTabProps) {
   const [copied, setCopied] = useState(false);
 
-  const prompt = spec.devinPrompt;
+  const prompt = spec.implementationPrompt;
 
   const copyPrompt = () => {
     navigator.clipboard.writeText(prompt);
