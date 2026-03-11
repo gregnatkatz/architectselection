@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { Search, Filter, ChevronRight, AlertTriangle, Loader2, X } from "lucide-react";
+import { Search, Filter, ChevronRight, AlertTriangle, Loader2, X, CheckCircle, Upload, ShieldCheck } from "lucide-react";
 import FunctionalSpec from "./FunctionalSpec";
 import ArchDiagram from "./ArchDiagram";
-import ImplementationSpecTab from "./ImplementationSpecTab";
 import { API_URL, AUTH_HEADERS } from "../api/client";
-import type { ArchResult, SpecOutput } from "../api/client";
+import type { ArchResult, SpecOutput, ValidationResult } from "../api/client";
 
 interface HealthcareCase {
   id: string;
@@ -18,6 +17,27 @@ interface HealthcareCase {
   primary_label: string;
   confidence: number;
   score: number;
+}
+
+const COMPLEXITY_LABELS: Record<string, string> = {
+  simple: "1-2 weeks",
+  moderate: "3-6 weeks",
+  complex: "8-16 weeks",
+  multiagent: "12-20 weeks",
+};
+
+const TEAM_SIZE_LABELS: Record<string, string> = {
+  small: "1-3 people",
+  medium: "4-8 people",
+  large: "9+ people",
+};
+
+function displayVal(key: string, val: string | string[]): string {
+  if (Array.isArray(val)) return val.join(", ") || "none";
+  if (key === "complexity") return COMPLEXITY_LABELS[val] || val;
+  if (key === "teamSize") return TEAM_SIZE_LABELS[val] || val;
+  if (key === "hasPhi") return val === "yes" ? "Yes \u2014 PHI" : "No PHI";
+  return val;
 }
 
 const ARCH_COLORS: Record<string, { bg: string; text: string; badge: string }> = {
@@ -36,7 +56,7 @@ const CATEGORIES = [
   "Operations & Workforce",
 ];
 
-type DetailTab = "spec" | "diagram" | "implementation";
+type DetailTab = "spec" | "diagram";
 
 export default function Dashboard() {
   const [cases, setCases] = useState<HealthcareCase[]>([]);
@@ -48,13 +68,23 @@ export default function Dashboard() {
   const [selectedCase, setSelectedCase] = useState<HealthcareCase | null>(null);
   const [detailTab, setDetailTab] = useState<DetailTab>("spec");
 
+  // Validation state
+  const [validating, setValidating] = useState(false);
+  const [validationResults, setValidationResults] = useState<Record<string, ValidationResult>>({});
+  const [validationStats, setValidationStats] = useState<{ validated: number; warning: number; corrected: number; advisory: number } | null>(null);
+
+  // Upload state
+  const [showUpload, setShowUpload] = useState(false);
+  const [uploadName, setUploadName] = useState("");
+  const [uploadGoal, setUploadGoal] = useState("");
+  const [uploading, setUploading] = useState(false);
+
   useEffect(() => {
     fetchCases();
   }, []);
 
   const fetchCases = async () => {
     try {
-      // Try static pre-generated file first (works without backend)
       const staticResp = await fetch("/healthcare-cases.json");
       if (staticResp.ok) {
         const data = await staticResp.json();
@@ -77,6 +107,63 @@ export default function Dashboard() {
     }
   };
 
+  const handleValidateAll = async () => {
+    setValidating(true);
+    try {
+      const resp = await fetch(`${API_URL}/api/validate-all`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...AUTH_HEADERS },
+      });
+      if (!resp.ok) throw new Error(`API error: ${resp.status}`);
+      const data = await resp.json();
+      const resultMap: Record<string, ValidationResult> = {};
+      for (const r of data.results) {
+        resultMap[r.id] = r;
+      }
+      setValidationResults(resultMap);
+      setValidationStats(data.stats);
+    } catch (err) {
+      console.error("Validation failed:", err);
+    } finally {
+      setValidating(false);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!uploadName || !uploadGoal) return;
+    setUploading(true);
+    try {
+      const resp = await fetch(`${API_URL}/api/upload-case`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", ...AUTH_HEADERS },
+        body: JSON.stringify({ useCaseName: uploadName, primaryGoal: uploadGoal }),
+      });
+      if (!resp.ok) throw new Error(`API error: ${resp.status}`);
+      const data = await resp.json();
+      const newCase: HealthcareCase = {
+        id: data.id,
+        useCaseName: data.useCaseName,
+        primaryGoal: data.primaryGoal,
+        category: data.category || "Custom",
+        answers: data.answers || {},
+        ranked: data.ranked || [],
+        spec: data.spec,
+        primary_arch: data.primary_arch,
+        primary_label: data.primary_label,
+        confidence: data.confidence,
+        score: data.score,
+      };
+      setCases((prev) => [...prev, newCase]);
+      setShowUpload(false);
+      setUploadName("");
+      setUploadGoal("");
+    } catch (err) {
+      console.error("Upload failed:", err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const filtered = cases.filter((c) => {
     const matchesSearch =
       search === "" ||
@@ -87,7 +174,6 @@ export default function Dashboard() {
     return matchesSearch && matchesCategory && matchesArch;
   });
 
-  // Stats
   const archCounts: Record<string, number> = {};
   for (const c of cases) {
     archCounts[c.primary_arch] = (archCounts[c.primary_arch] || 0) + 1;
@@ -119,9 +205,9 @@ export default function Dashboard() {
   // Detail view
   if (selectedCase) {
     const colors = ARCH_COLORS[selectedCase.primary_arch] || ARCH_COLORS.FOUNDRY_AGENT;
+    const vr = validationResults[selectedCase.id];
     return (
       <div className="space-y-6">
-        {/* Back button */}
         <button
           onClick={() => setSelectedCase(null)}
           className="text-slate-400 hover:text-white text-sm flex items-center gap-1 transition-colors"
@@ -129,7 +215,6 @@ export default function Dashboard() {
           &larr; Back to Dashboard
         </button>
 
-        {/* Case header */}
         <div className="bg-slate-800 rounded-xl p-6">
           <div className="flex items-start justify-between">
             <div className="flex-1">
@@ -144,25 +229,34 @@ export default function Dashboard() {
               <div className="mt-2 text-sm text-slate-400">
                 Score: {selectedCase.score} | Confidence: {Math.round(selectedCase.confidence * 100)}%
               </div>
+              {vr && (
+                <div className="mt-2">
+                  <span className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${
+                    vr.validation.overall_status === "validated" ? "bg-green-600/20 text-green-300 border border-green-600/50" :
+                    vr.validation.overall_status === "corrected" ? "bg-red-600/20 text-red-300 border border-red-600/50" :
+                    "bg-orange-600/20 text-orange-300 border border-orange-600/50"
+                  }`}>
+                    {vr.validation.overall_status === "validated" ? <CheckCircle size={10} /> : <AlertTriangle size={10} />}
+                    {vr.validation.overall_status}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Input signals */}
           <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
             {Object.entries(selectedCase.answers).map(([key, val]) => {
               if (key === "useCaseName" || key === "primaryGoal") return null;
-              const display = Array.isArray(val) ? val.join(", ") || "none" : val;
               return (
                 <div key={key} className="bg-slate-700/50 rounded-lg px-3 py-2">
                   <div className="text-xs text-slate-500 capitalize">{key.replace(/([A-Z])/g, " $1")}</div>
-                  <div className="text-sm text-slate-300 mt-0.5">{display}</div>
+                  <div className="text-sm text-slate-300 mt-0.5">{displayVal(key, val)}</div>
                 </div>
               );
             })}
           </div>
         </div>
 
-        {/* Low confidence warning */}
         {selectedCase.confidence < 0.5 && (
           <div className="bg-orange-900/30 border border-orange-700 rounded-lg p-4 flex items-start gap-3">
             <AlertTriangle className="text-orange-400 flex-shrink-0 mt-0.5" size={20} />
@@ -175,12 +269,63 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Tabs */}
+        {/* Validation detail (if available) */}
+        {vr && vr.validation.validator && (
+          <div className="bg-slate-800 rounded-xl p-6">
+            <h3 className="text-lg font-semibold text-white flex items-center gap-2 mb-4">
+              <ShieldCheck size={20} className="text-green-400" /> Validation Pipeline Results
+            </h3>
+
+            {/* Validator */}
+            <div className="mb-4">
+              <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Validator Agent</h4>
+              <div className="flex items-center gap-2 mb-2">
+                <span className="text-xs text-slate-400">
+                  {vr.validation.validator.passed_checks.length}/{vr.validation.validator.total_checks} checks passed
+                  ({Math.round(vr.validation.validator.pass_rate * 100)}%)
+                </span>
+              </div>
+              {vr.validation.validator.issues.length > 0 && (
+                <div className="space-y-1">
+                  {vr.validation.validator.issues.map((issue, i) => (
+                    <div key={i} className="text-xs bg-red-900/20 border border-red-800/50 rounded p-2">
+                      <span className="text-red-300 font-medium">{issue.check}:</span>
+                      <span className="text-slate-400 ml-1">{issue.message}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Requirements Test */}
+            <div className="mb-4">
+              <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Requirements Test Agent</h4>
+              <p className="text-sm text-slate-300">{vr.validation.requirements_test.verdict}</p>
+              {vr.validation.requirements_test.could_simplify && (
+                <p className="text-xs text-amber-300 mt-1">Could potentially be simplified to a less complex architecture.</p>
+              )}
+            </div>
+
+            {/* Corrective */}
+            {vr.validation.corrective.action !== "none" && (
+              <div>
+                <h4 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-2">Corrective Agent</h4>
+                <p className="text-sm text-slate-300">{vr.validation.corrective.message}</p>
+                {vr.validation.corrective.corrections.map((c, i) => (
+                  <div key={i} className="text-xs bg-amber-900/20 border border-amber-800/50 rounded p-2 mt-1">
+                    <span className="text-amber-300">{c.issue}:</span> <span className="text-slate-400">{c.fix}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Tabs - only spec + diagram */}
         <div className="flex gap-1 bg-slate-800 rounded-lg p-1">
           {([
             { key: "spec" as DetailTab, label: "Functional Spec" },
             { key: "diagram" as DetailTab, label: "Architecture Diagram" },
-            { key: "implementation" as DetailTab, label: "Implementation Spec" },
           ]).map((tab) => (
             <button
               key={tab.key}
@@ -196,11 +341,9 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Tab content */}
         <div className="bg-slate-800/50 rounded-xl p-6">
           {detailTab === "spec" && <FunctionalSpec spec={selectedCase.spec} />}
-          {detailTab === "diagram" && <ArchDiagram ranked={selectedCase.ranked} />}
-          {detailTab === "implementation" && <ImplementationSpecTab spec={selectedCase.spec} />}
+          {detailTab === "diagram" && <ArchDiagram ranked={selectedCase.ranked} inputs={selectedCase.answers} />}
         </div>
       </div>
     );
@@ -214,8 +357,8 @@ export default function Dashboard() {
         {[
           { id: "COPILOT_STUDIO", label: "Copilot Studio" },
           { id: "AGENT_BUILDER", label: "Agent Builder" },
-          { id: "FABRIC_AGENT", label: "Fabric Agent" },
-          { id: "FOUNDRY_AGENT", label: "Foundry Agent" },
+          { id: "FABRIC_AGENT", label: "Fabric Data Agent" },
+          { id: "FOUNDRY_AGENT", label: "Azure AI Foundry" },
         ].map((arch) => {
           const colors = ARCH_COLORS[arch.id];
           const count = archCounts[arch.id] || 0;
@@ -235,6 +378,87 @@ export default function Dashboard() {
           );
         })}
       </div>
+
+      {/* Action buttons: Validate All + Upload */}
+      <div className="flex flex-wrap gap-3">
+        <button
+          onClick={handleValidateAll}
+          disabled={validating}
+          className="flex items-center gap-2 px-4 py-2 text-sm bg-green-600 hover:bg-green-500 disabled:bg-green-800 disabled:cursor-not-allowed text-white rounded-lg transition-all"
+        >
+          {validating ? <Loader2 size={14} className="animate-spin" /> : <ShieldCheck size={14} />}
+          {validating ? "Validating all cases..." : "Validate All"}
+        </button>
+        <button
+          onClick={() => setShowUpload(!showUpload)}
+          className="flex items-center gap-2 px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-all"
+        >
+          <Upload size={14} /> Upload Use Case
+        </button>
+
+        {/* Validation stats summary */}
+        {validationStats && (
+          <div className="flex items-center gap-3 ml-auto text-xs">
+            <span className="text-green-300 bg-green-900/30 px-2 py-1 rounded">
+              {validationStats.validated} validated
+            </span>
+            <span className="text-orange-300 bg-orange-900/30 px-2 py-1 rounded">
+              {validationStats.warning + validationStats.advisory} warnings
+            </span>
+            <span className="text-red-300 bg-red-900/30 px-2 py-1 rounded">
+              {validationStats.corrected} corrected
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Upload form */}
+      {showUpload && (
+        <div className="bg-slate-800 rounded-xl p-6 border border-indigo-500/50">
+          <h3 className="text-white font-semibold mb-4">Upload New Use Case</h3>
+          <div className="space-y-3">
+            <div>
+              <label className="text-xs text-slate-400 uppercase tracking-wider">Use Case Name</label>
+              <input
+                type="text"
+                value={uploadName}
+                onChange={(e) => setUploadName(e.target.value)}
+                placeholder="e.g., Patient Discharge Summary Generator"
+                className="w-full mt-1 px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <div>
+              <label className="text-xs text-slate-400 uppercase tracking-wider">Primary Goal</label>
+              <input
+                type="text"
+                value={uploadGoal}
+                onChange={(e) => setUploadGoal(e.target.value)}
+                placeholder="e.g., Automatically generate discharge summaries from clinical notes"
+                className="w-full mt-1 px-3 py-2 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={handleUpload}
+                disabled={uploading || !uploadName || !uploadGoal}
+                className="flex items-center gap-2 px-4 py-2 text-sm bg-indigo-600 hover:bg-indigo-500 disabled:bg-indigo-800 disabled:cursor-not-allowed text-white rounded-lg transition-all"
+              >
+                {uploading ? <Loader2 size={14} className="animate-spin" /> : <Upload size={14} />}
+                {uploading ? "Analyzing..." : "Analyze & Add"}
+              </button>
+              <button
+                onClick={() => setShowUpload(false)}
+                className="px-4 py-2 text-sm text-slate-400 hover:text-white transition-colors"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+          <p className="text-xs text-slate-500 mt-3">
+            The scoring engine will analyze your use case, recommend an architecture, run the validation pipeline, and add it to the dashboard.
+          </p>
+        </div>
+      )}
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-3">
@@ -270,7 +494,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* Results count */}
       <div className="text-sm text-slate-500">
         Showing {filtered.length} of {cases.length} healthcare use cases
       </div>
@@ -279,6 +502,7 @@ export default function Dashboard() {
       <div className="space-y-2">
         {filtered.map((c) => {
           const colors = ARCH_COLORS[c.primary_arch] || ARCH_COLORS.FOUNDRY_AGENT;
+          const vr = validationResults[c.id];
           return (
             <button
               key={c.id}
@@ -293,6 +517,16 @@ export default function Dashboard() {
                     </span>
                     <span className="text-xs text-slate-600">|</span>
                     <span className="text-xs text-slate-500">{c.category}</span>
+                    {vr && (
+                      <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full ${
+                        vr.validation.overall_status === "validated" ? "bg-green-600/20 text-green-300" :
+                        vr.validation.overall_status === "corrected" ? "bg-red-600/20 text-red-300" :
+                        "bg-orange-600/20 text-orange-300"
+                      }`}>
+                        {vr.validation.overall_status === "validated" ? <CheckCircle size={8} /> : <AlertTriangle size={8} />}
+                        {vr.validation.overall_status}
+                      </span>
+                    )}
                   </div>
                   <h3 className="text-white font-medium mt-1 truncate">{c.useCaseName}</h3>
                   <p className="text-slate-400 text-sm mt-0.5 truncate">{c.primaryGoal}</p>

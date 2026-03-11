@@ -20,6 +20,7 @@ from app.knowledge.sqlite_store import get_connection, save_use_case, get_cases
 from app.knowledge.healthcare_cases import HEALTHCARE_CASES
 from app.knowledge.chroma_store import get_collection, get_doc_count
 from app.spec.generator import generate_spec
+from app.spec.agents import run_full_validation_pipeline
 from app.agents.guidance_sync import (
     run_full_sync,
     get_sync_status,
@@ -99,6 +100,24 @@ class GuidanceAskRequest(BaseModel):
     question: str
     arch_filter: str = "ALL"
 
+
+
+class UploadCaseRequest(BaseModel):
+    useCaseName: str
+    primaryGoal: str
+    category: str = "Custom"
+    complexity: str = "moderate"
+    dataSources: list[str] = []
+    hasPhi: str = "no"
+    uxChannel: str = "web"
+    codeCapability: str = "mixed"
+    userVolume: str = "medium"
+    realtime: str = "no"
+    teamSize: str = "medium"
+    agentBehavior: str = "guided"
+    customModel: str = "no"
+    humanInLoop: str = "no"
+    description: str = ""
 
 class CustomDocRequest(BaseModel):
     url: str
@@ -204,6 +223,11 @@ async def healthcare_cases(category: str = Query("", description="Filter by cate
         ranked = compute_scores(answers)
         spec = generate_spec(answers, ranked)
         primary = ranked[0] if ranked else {}
+        # Inject architecture reasoning into spec for display
+        if case.get("whyThisArchitecture"):
+            spec["whyThisArchitecture"] = case["whyThisArchitecture"]
+        if case.get("alternativeConsidered"):
+            spec["alternativeConsidered"] = case["alternativeConsidered"]
         entry = {
             "id": case["id"],
             "useCaseName": case["useCaseName"],
@@ -358,6 +382,139 @@ async def guidance_ask(req: GuidanceAskRequest, _=Depends(require_entra)):
         "answer": "No relevant guidance found. Try rephrasing your question.",
         "citations": [],
         "foundry_used": False,
+    }
+
+
+
+
+# ─── Validation Pipeline ─────────────────────────────────────────
+
+@app.post("/api/validate-all")
+async def validate_all_cases():
+    """Run Validator + Requirements Test + Corrective agents on all 50 healthcare cases."""
+    results = []
+    stats = {"validated": 0, "warning": 0, "corrected": 0, "advisory": 0}
+
+    for case in HEALTHCARE_CASES:
+        answers = {
+            "useCaseName": case["useCaseName"],
+            "primaryGoal": case["primaryGoal"],
+            "complexity": case.get("complexity", "simple"),
+            "dataSources": case.get("dataSources", []),
+            "hasPhi": case.get("hasPhi", "no"),
+            "uxChannel": case.get("uxChannel", "teams"),
+            "codeCapability": case.get("codeCapability", "lowcode"),
+            "userVolume": case.get("userVolume", "medium"),
+            "realtime": case.get("realtime", "no"),
+            "teamSize": case.get("teamSize", "medium"),
+            "agentBehavior": case.get("agentBehavior", ""),
+            "customModel": case.get("customModel", "no"),
+            "humanInLoop": case.get("humanInLoop", "no"),
+        }
+        ranked = compute_scores(answers)
+        primary = ranked[0] if ranked else {}
+        primary_arch = primary.get("id", "UNKNOWN")
+
+        pipeline_result = run_full_validation_pipeline(answers, primary_arch)
+
+        status = pipeline_result["overall_status"]
+        if status == "validated":
+            stats["validated"] += 1
+        elif status == "corrected":
+            stats["corrected"] += 1
+        elif status == "advisory":
+            stats["advisory"] += 1
+        else:
+            stats["warning"] += 1
+
+        results.append({
+            "id": case["id"],
+            "useCaseName": case["useCaseName"],
+            "category": case.get("category", ""),
+            "recommended_arch": primary_arch,
+            "validation": pipeline_result,
+        })
+
+    return {
+        "results": results,
+        "stats": stats,
+        "total": len(results),
+    }
+
+
+@app.post("/api/validate-case/{case_id}")
+async def validate_single_case(case_id: str):
+    """Run validation pipeline on a single healthcare case."""
+    case = next((c for c in HEALTHCARE_CASES if c["id"] == case_id), None)
+    if not case:
+        raise HTTPException(status_code=404, detail=f"Case {case_id} not found")
+
+    answers = {
+        "useCaseName": case["useCaseName"],
+        "primaryGoal": case["primaryGoal"],
+        "complexity": case.get("complexity", "simple"),
+        "dataSources": case.get("dataSources", []),
+        "hasPhi": case.get("hasPhi", "no"),
+        "uxChannel": case.get("uxChannel", "teams"),
+        "codeCapability": case.get("codeCapability", "lowcode"),
+        "userVolume": case.get("userVolume", "medium"),
+        "realtime": case.get("realtime", "no"),
+        "teamSize": case.get("teamSize", "medium"),
+        "agentBehavior": case.get("agentBehavior", ""),
+        "customModel": case.get("customModel", "no"),
+        "humanInLoop": case.get("humanInLoop", "no"),
+    }
+    ranked = compute_scores(answers)
+    primary = ranked[0] if ranked else {}
+    spec = generate_spec(answers, ranked)
+
+    pipeline_result = run_full_validation_pipeline(answers, primary.get("id", "UNKNOWN"))
+
+    return {
+        "id": case["id"],
+        "useCaseName": case["useCaseName"],
+        "recommended_arch": primary.get("id", ""),
+        "spec": spec,
+        "validation": pipeline_result,
+    }
+
+
+@app.post("/api/upload-case")
+async def upload_case(req: UploadCaseRequest):
+    """Upload a new use case, analyze it through the scoring engine and validation pipeline."""
+    answers = {
+        "useCaseName": req.useCaseName,
+        "primaryGoal": req.primaryGoal,
+        "complexity": req.complexity,
+        "dataSources": req.dataSources,
+        "hasPhi": req.hasPhi,
+        "uxChannel": req.uxChannel,
+        "codeCapability": req.codeCapability,
+        "userVolume": req.userVolume,
+        "realtime": req.realtime,
+        "teamSize": req.teamSize,
+        "agentBehavior": req.agentBehavior,
+        "customModel": req.customModel,
+        "humanInLoop": req.humanInLoop,
+    }
+    ranked = compute_scores(answers)
+    primary = ranked[0] if ranked else {}
+    spec = generate_spec(answers, ranked)
+    pipeline_result = run_full_validation_pipeline(answers, primary.get("id", "UNKNOWN"))
+
+    return {
+        "id": f"custom-{hash(req.useCaseName) % 10000:04d}",
+        "useCaseName": req.useCaseName,
+        "primaryGoal": req.primaryGoal,
+        "category": req.category,
+        "answers": answers,
+        "ranked": ranked,
+        "spec": spec,
+        "primary_arch": primary.get("id", ""),
+        "primary_label": primary.get("label", ""),
+        "confidence": primary.get("confidence", 0.0),
+        "score": primary.get("score", 0),
+        "validation": pipeline_result,
     }
 
 

@@ -32,18 +32,40 @@ export default function FunctionalSpec({ spec }: FunctionalSpecProps) {
       </div>
 
       <div className="bg-slate-800 rounded-lg p-6 space-y-6">
-        {/* Title */}
-        <div>
-          <h4 className="text-xl font-bold text-white">{spec.title}</h4>
-          <p className="text-slate-400 mt-1">{spec.primaryGoal}</p>
-        </div>
-
-        {/* Recommended Architecture */}
-        <div className="bg-indigo-900/30 border border-indigo-700 rounded-lg p-4">
-          <div className="text-sm text-indigo-400 font-medium mb-1">Recommended Architecture</div>
-          <div className="text-lg font-bold text-white">{spec.recommendedArchitecture.label}</div>
-          <div className="text-sm text-slate-400 mt-1">
-            Confidence: {Math.round(spec.recommendedArchitecture.confidence * 100)}% | Score: {spec.recommendedArchitecture.score}
+        {/* Executive Summary */}
+        <div className="bg-gradient-to-r from-indigo-900/40 to-purple-900/40 border border-indigo-700/50 rounded-lg p-5">
+          <h4 className="text-sm font-semibold text-indigo-300 uppercase tracking-wider mb-3">Executive Summary</h4>
+          <div className="space-y-3">
+            <div>
+              <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Use Case</div>
+              <h4 className="text-lg font-bold text-white">{spec.title}</h4>
+            </div>
+            <div>
+              <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Expected Outcome</div>
+              <p className="text-slate-300">{spec.primaryGoal}</p>
+            </div>
+            <div className="grid grid-cols-2 gap-4 pt-2">
+              <div>
+                <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Recommended Architecture</div>
+                <div className="text-base font-semibold text-white">{spec.recommendedArchitecture.label}</div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Confidence</div>
+                <div className="text-base font-semibold text-white">{Math.round(spec.recommendedArchitecture.confidence * 100)}%</div>
+              </div>
+            </div>
+            {spec.whyThisArchitecture && (
+              <div className="pt-2 border-t border-indigo-700/30">
+                <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Why This Architecture</div>
+                <p className="text-sm text-slate-300">{spec.whyThisArchitecture}</p>
+              </div>
+            )}
+            {spec.alternativeConsidered && (
+              <div>
+                <div className="text-xs text-slate-500 uppercase tracking-wider mb-1">Alternative Considered</div>
+                <p className="text-sm text-slate-400">{spec.alternativeConsidered}</p>
+              </div>
+            )}
           </div>
         </div>
 
