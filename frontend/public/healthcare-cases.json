@@ -3530,6 +3530,18 @@
           "Configure real-time analytics if needed"
         ],
         "implementationPrompt": "Build a Copilot + Fabric Data Agent implementation for: Revenue Cycle Analytics Dashboard. Primary goal: Analyze revenue cycle metrics (denial rates, days in A/R, collection rates) across departments using Fabric Lakehouse data. Complexity: complex. Data sources: fabric. PHI: financial. UX channel: web. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning can optimize Fabric Data Agent query routing and data pipeline orchestration through reinforcement learning, improving response accuracy and latency over time.",
+          "optimizationPaths": [
+            {
+              "name": "Query Routing Optimization",
+              "description": "Use RL to learn optimal query routing across Fabric lakehouse tables, reducing latency and improving result relevance."
+            }
+          ],
+          "trainingStrategy": "Collect query performance metrics, then use Lightning's offline RL to train routing policies without modifying the data agent code."
+        },
         "whyThisArchitecture": "Data-centric analytics pattern on Microsoft Fabric + OneLake. Fabric Data Agent enables conversational Q&A over lakehouse data using natural language (Microsoft Learn: Fabric data agent concepts). Financial data in Fabric Lakehouse requires the Fabric Agent for native OneLake access and semantic model integration.",
         "alternativeConsidered": "Foundry was considered but there's no PHI in aggregated revenue metrics \u2014 financial data compliance is handled by Fabric's security controls. Fabric Agent provides direct lakehouse access without additional infrastructure."
       },
@@ -3671,6 +3683,18 @@
           "Configure real-time analytics if needed"
         ],
         "implementationPrompt": "Build a Copilot + Fabric Data Agent implementation for: Supply Chain Cost Optimizer. Primary goal: Analyze medical supply procurement costs, vendor pricing, and inventory levels from Snowflake warehouse to identify savings opportunities. Complexity: complex. Data sources: snowflake, fabric. PHI: financial. UX channel: web. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning can optimize Fabric Data Agent query routing and data pipeline orchestration through reinforcement learning, improving response accuracy and latency over time.",
+          "optimizationPaths": [
+            {
+              "name": "Query Routing Optimization",
+              "description": "Use RL to learn optimal query routing across Fabric lakehouse tables, reducing latency and improving result relevance."
+            }
+          ],
+          "trainingStrategy": "Collect query performance metrics, then use Lightning's offline RL to train routing policies without modifying the data agent code."
+        },
         "whyThisArchitecture": "Multi-source analytics pattern combining Snowflake warehouse data with Fabric Lakehouse. Fabric Agent's native Snowflake connector and OneLake integration enable cross-platform supply chain analysis (Microsoft Learn: Fabric data agent with Lakehouse). Financial procurement data \u2014 no PHI involved.",
         "alternativeConsidered": "Foundry was considered but there's no PHI, no custom models, and no autonomous behavior needed. Fabric Agent handles multi-source analytics natively."
       },
@@ -3809,6 +3833,18 @@
           "Configure real-time analytics if needed"
         ],
         "implementationPrompt": "Build a Copilot + Fabric Data Agent implementation for: Patient Volume Forecasting. Primary goal: Forecast patient admission volumes by department and season using historical Fabric Lakehouse data for capacity planning. Complexity: complex. Data sources: fabric. PHI: financial. UX channel: web. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning can optimize Fabric Data Agent query routing and data pipeline orchestration through reinforcement learning, improving response accuracy and latency over time.",
+          "optimizationPaths": [
+            {
+              "name": "Query Routing Optimization",
+              "description": "Use RL to learn optimal query routing across Fabric lakehouse tables, reducing latency and improving result relevance."
+            }
+          ],
+          "trainingStrategy": "Collect query performance metrics, then use Lightning's offline RL to train routing policies without modifying the data agent code."
+        },
         "whyThisArchitecture": "Time-series analytics pattern on Fabric Lakehouse. Fabric Data Agent enables natural language queries over historical admission data and forecasting models stored in OneLake (Microsoft Learn: Fabric data agent scenario with AdventureWorks). Aggregated volume data \u2014 no individual PHI.",
         "alternativeConsidered": "Foundry was considered for ML-based forecasting but Fabric's built-in ML capabilities and Data Agent handle this pattern without requiring separate AI infrastructure."
       },
@@ -3948,6 +3984,18 @@
           "Configure real-time analytics if needed"
         ],
         "implementationPrompt": "Build a Copilot + Fabric Data Agent implementation for: Claims Denial Pattern Analyzer. Primary goal: Identify patterns in insurance claim denials by analyzing denial codes, payer trends, and appeal outcomes from Fabric Lakehouse. Complexity: complex. Data sources: fabric. PHI: financial. UX channel: web. Code capability: procode. User volume: enterprise. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning can optimize Fabric Data Agent query routing and data pipeline orchestration through reinforcement learning, improving response accuracy and latency over time.",
+          "optimizationPaths": [
+            {
+              "name": "Query Routing Optimization",
+              "description": "Use RL to learn optimal query routing across Fabric lakehouse tables, reducing latency and improving result relevance."
+            }
+          ],
+          "trainingStrategy": "Collect query performance metrics, then use Lightning's offline RL to train routing policies without modifying the data agent code."
+        },
         "whyThisArchitecture": "Pattern analysis over structured financial data in Fabric Lakehouse. Fabric Data Agent enables conversational analytics over denial code distributions, payer-specific patterns, and trending (Microsoft Learn: Semantic model best practices for data agent). Financial claims data \u2014 aggregated, no individual PHI.",
         "alternativeConsidered": "Foundry was considered for advanced ML but the pattern analysis is primarily SQL-based aggregation over structured data \u2014 Fabric Agent handles this more efficiently."
       },
@@ -4088,6 +4136,18 @@
           "Configure real-time analytics if needed"
         ],
         "implementationPrompt": "Build a Copilot + Fabric Data Agent implementation for: Operational KPI Monitor. Primary goal: Monitor and report on operational KPIs (bed occupancy, ER wait times, OR utilization) from Fabric Lakehouse data in real-time dashboards. Complexity: complex. Data sources: fabric. PHI: financial. UX channel: web. Code capability: procode. User volume: enterprise. Real-time: yes. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning can optimize Fabric Data Agent query routing and data pipeline orchestration through reinforcement learning, improving response accuracy and latency over time.",
+          "optimizationPaths": [
+            {
+              "name": "Query Routing Optimization",
+              "description": "Use RL to learn optimal query routing across Fabric lakehouse tables, reducing latency and improving result relevance."
+            }
+          ],
+          "trainingStrategy": "Collect query performance metrics, then use Lightning's offline RL to train routing policies without modifying the data agent code."
+        },
         "whyThisArchitecture": "Real-time KPI monitoring pattern using Fabric's streaming analytics and Data Agent. Fabric Agent provides conversational access to live operational metrics stored in OneLake, with Power BI integration for visualization (Microsoft Learn: Fabric data agent concepts). Aggregated operational metrics \u2014 no individual PHI.",
         "alternativeConsidered": "Foundry was considered for real-time processing but Fabric's native streaming and KQL capabilities handle operational KPI monitoring without additional infrastructure."
       },
@@ -4227,6 +4287,18 @@
           "Configure real-time analytics if needed"
         ],
         "implementationPrompt": "Build a Copilot + Fabric Data Agent implementation for: Staffing Cost Analyzer. Primary goal: Analyze staffing costs, overtime trends, and labor productivity metrics across departments using Snowflake data. Complexity: complex. Data sources: snowflake. PHI: financial. UX channel: web. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning can optimize Fabric Data Agent query routing and data pipeline orchestration through reinforcement learning, improving response accuracy and latency over time.",
+          "optimizationPaths": [
+            {
+              "name": "Query Routing Optimization",
+              "description": "Use RL to learn optimal query routing across Fabric lakehouse tables, reducing latency and improving result relevance."
+            }
+          ],
+          "trainingStrategy": "Collect query performance metrics, then use Lightning's offline RL to train routing policies without modifying the data agent code."
+        },
         "whyThisArchitecture": "Financial analytics pattern on Snowflake data warehouse. Fabric Agent's Snowflake connector enables conversational access to staffing cost data without migrating to OneLake (Microsoft Learn: Fabric data agent creation). Financial labor data \u2014 no PHI.",
         "alternativeConsidered": "Agent Builder was considered but the data lives in Snowflake, not SharePoint \u2014 Fabric Agent provides the native data warehouse connectivity needed."
       },
@@ -4365,6 +4437,18 @@
           "Configure real-time analytics if needed"
         ],
         "implementationPrompt": "Build a Copilot + Fabric Data Agent implementation for: Population Health Trend Analyzer. Primary goal: Analyze de-identified population health trends (chronic disease prevalence, vaccination rates, demographic patterns) from Fabric Lakehouse. Complexity: complex. Data sources: fabric. PHI: financial. UX channel: web. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning can optimize Fabric Data Agent query routing and data pipeline orchestration through reinforcement learning, improving response accuracy and latency over time.",
+          "optimizationPaths": [
+            {
+              "name": "Query Routing Optimization",
+              "description": "Use RL to learn optimal query routing across Fabric lakehouse tables, reducing latency and improving result relevance."
+            }
+          ],
+          "trainingStrategy": "Collect query performance metrics, then use Lightning's offline RL to train routing policies without modifying the data agent code."
+        },
         "whyThisArchitecture": "Population-level analytics pattern on de-identified datasets in Fabric Lakehouse. Fabric Data Agent enables epidemiologists to query trends in natural language (Microsoft Learn: Fabric data agent scenario). Data is de-identified and aggregated \u2014 no individual PHI present.",
         "alternativeConsidered": "Foundry was considered for advanced ML models but the analytics are primarily SQL-based trend analysis over pre-aggregated data \u2014 Fabric Agent handles this more efficiently."
       },
@@ -4503,6 +4587,18 @@
           "Configure real-time analytics if needed"
         ],
         "implementationPrompt": "Build a Copilot + Fabric Data Agent implementation for: Equipment Utilization Tracker. Primary goal: Track and analyze medical equipment utilization rates, maintenance schedules, and replacement forecasts from Fabric Lakehouse data. Complexity: complex. Data sources: fabric. PHI: financial. UX channel: web. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning can optimize Fabric Data Agent query routing and data pipeline orchestration through reinforcement learning, improving response accuracy and latency over time.",
+          "optimizationPaths": [
+            {
+              "name": "Query Routing Optimization",
+              "description": "Use RL to learn optimal query routing across Fabric lakehouse tables, reducing latency and improving result relevance."
+            }
+          ],
+          "trainingStrategy": "Collect query performance metrics, then use Lightning's offline RL to train routing policies without modifying the data agent code."
+        },
         "whyThisArchitecture": "Asset management analytics pattern using Fabric Lakehouse. Fabric Data Agent enables natural language queries over equipment telemetry and maintenance data stored in OneLake. Financial asset data \u2014 no PHI.",
         "alternativeConsidered": "A standalone Power BI dashboard exists but the conversational agent enables ad-hoc queries that aren't covered by pre-built reports."
       },
@@ -4645,6 +4741,18 @@
           "Configure real-time analytics if needed"
         ],
         "implementationPrompt": "Build a Copilot + Fabric Data Agent implementation for: Payer Mix Optimization Analyzer. Primary goal: Analyze payer mix distribution, reimbursement rates, and contract performance across service lines using Snowflake and Fabric data. Complexity: complex. Data sources: snowflake, fabric. PHI: financial. UX channel: web. Code capability: procode. User volume: enterprise. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning can optimize Fabric Data Agent query routing and data pipeline orchestration through reinforcement learning, improving response accuracy and latency over time.",
+          "optimizationPaths": [
+            {
+              "name": "Query Routing Optimization",
+              "description": "Use RL to learn optimal query routing across Fabric lakehouse tables, reducing latency and improving result relevance."
+            }
+          ],
+          "trainingStrategy": "Collect query performance metrics, then use Lightning's offline RL to train routing policies without modifying the data agent code."
+        },
         "whyThisArchitecture": "Multi-source financial analytics combining Snowflake (payer contracts) and Fabric Lakehouse (claims data). Fabric Agent's dual-source connectivity enables cross-platform payer analysis without data migration (Microsoft Learn: Fabric data agent with multiple sources).",
         "alternativeConsidered": "Foundry was considered for advanced analytics but the pattern is primarily SQL-based financial aggregation \u2014 Fabric Agent handles cross-source joins natively."
       },
@@ -4783,6 +4891,18 @@
           "Configure real-time analytics if needed"
         ],
         "implementationPrompt": "Build a Copilot + Fabric Data Agent implementation for: Clinical Trial Enrollment Analytics. Primary goal: Analyze clinical trial enrollment rates, screening-to-enrollment conversion, and site performance metrics from Fabric Lakehouse. Complexity: complex. Data sources: fabric. PHI: financial. UX channel: web. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning can optimize Fabric Data Agent query routing and data pipeline orchestration through reinforcement learning, improving response accuracy and latency over time.",
+          "optimizationPaths": [
+            {
+              "name": "Query Routing Optimization",
+              "description": "Use RL to learn optimal query routing across Fabric lakehouse tables, reducing latency and improving result relevance."
+            }
+          ],
+          "trainingStrategy": "Collect query performance metrics, then use Lightning's offline RL to train routing policies without modifying the data agent code."
+        },
         "whyThisArchitecture": "Trial analytics pattern on de-identified enrollment metrics in Fabric Lakehouse. Fabric Data Agent enables natural language queries over trial performance data (enrollment rates, conversion funnels, site comparisons). Aggregated trial metrics \u2014 no individual PHI.",
         "alternativeConsidered": "Foundry was considered for ML-based enrollment prediction but the current need is descriptive analytics over structured data \u2014 Fabric Agent is more efficient."
       },
@@ -4922,6 +5042,18 @@
           "Configure real-time analytics if needed"
         ],
         "implementationPrompt": "Build a Copilot + Fabric Data Agent implementation for: Energy & Sustainability Monitor. Primary goal: Track hospital energy consumption, carbon footprint, and sustainability metrics from IoT sensor data in Fabric Lakehouse. Complexity: complex. Data sources: fabric. PHI: financial. UX channel: web. Code capability: procode. User volume: large. Real-time: yes. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning can optimize Fabric Data Agent query routing and data pipeline orchestration through reinforcement learning, improving response accuracy and latency over time.",
+          "optimizationPaths": [
+            {
+              "name": "Query Routing Optimization",
+              "description": "Use RL to learn optimal query routing across Fabric lakehouse tables, reducing latency and improving result relevance."
+            }
+          ],
+          "trainingStrategy": "Collect query performance metrics, then use Lightning's offline RL to train routing policies without modifying the data agent code."
+        },
         "whyThisArchitecture": "IoT analytics pattern using Fabric's real-time streaming and Data Agent. Energy consumption and sustainability metrics from building sensors flow into OneLake for trend analysis and anomaly detection. No PHI \u2014 facility operations data only.",
         "alternativeConsidered": "Azure IoT Hub + Foundry was considered but Fabric's native streaming analytics and Data Agent provide the end-to-end pipeline without additional infrastructure."
       },
@@ -5061,6 +5193,18 @@
           "Configure real-time analytics if needed"
         ],
         "implementationPrompt": "Build a Copilot + Fabric Data Agent implementation for: Pharmacy Inventory Optimizer. Primary goal: Optimize pharmacy inventory levels by analyzing dispensing patterns, expiration rates, and reorder points from Snowflake warehouse data. Complexity: complex. Data sources: snowflake. PHI: financial. UX channel: web. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning can optimize Fabric Data Agent query routing and data pipeline orchestration through reinforcement learning, improving response accuracy and latency over time.",
+          "optimizationPaths": [
+            {
+              "name": "Query Routing Optimization",
+              "description": "Use RL to learn optimal query routing across Fabric lakehouse tables, reducing latency and improving result relevance."
+            }
+          ],
+          "trainingStrategy": "Collect query performance metrics, then use Lightning's offline RL to train routing policies without modifying the data agent code."
+        },
         "whyThisArchitecture": "Inventory analytics pattern on Snowflake data warehouse. Fabric Agent's Snowflake connector enables conversational analysis of dispensing patterns, stock levels, and reorder optimization. Financial inventory data \u2014 no individual PHI.",
         "alternativeConsidered": "Foundry was considered for predictive restocking models but the current need is descriptive analytics and threshold-based alerts \u2014 Fabric Agent handles this without ML infrastructure."
       },
@@ -5201,6 +5345,22 @@
           "Deploy with multi-agent orchestration if needed"
         ],
         "implementationPrompt": "Build a Copilot + Azure AI Foundry implementation for: Patient Discharge Summary Generator. Primary goal: Automatically generate HIPAA-compliant discharge summaries from clinical notes, lab results, and medication lists. Complexity: complex. Data sources: azuresql. PHI: yes. UX channel: web. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning decouples RL training from agent logic, enabling continuous optimization of agent behavior without rewriting code. This is especially valuable for multi-agent healthcare workflows where agent coordination must improve over time.",
+          "optimizationPaths": [
+            {
+              "name": "Multi-Agent Coordination RL",
+              "description": "Use Lightning's decoupled RL to train coordination policies across agents without modifying individual agent code. Agents learn optimal handoff timing, task allocation, and escalation patterns."
+            },
+            {
+              "name": "Autonomous Decision Optimization",
+              "description": "Lightning enables reward shaping for autonomous agents \u2014 define clinical accuracy, latency, and safety reward signals, then let the RL trainer optimize decision boundaries independently."
+            }
+          ],
+          "trainingStrategy": "Offline RL with logged interaction data. Lightning separates the training loop from the serving loop, so agent behavior improves from historical data without production code changes."
+        },
         "whyThisArchitecture": "PHI/HIPAA compliance is a hard requirement \u2014 only Azure AI Foundry provides the BAA coverage and audit controls needed for processing clinical notes with Protected Health Information (Microsoft Learn: Foundry Agent Service overview). Autonomous document generation from PHI data requires Foundry's compliance boundary and content safety controls.",
         "alternativeConsidered": "Copilot Studio and Agent Builder cannot process PHI data. Fabric Agent lacks the compliance controls needed for clinical document generation with patient data."
       },
@@ -5342,6 +5502,22 @@
           "Deploy with multi-agent orchestration if needed"
         ],
         "implementationPrompt": "Build a Copilot + Azure AI Foundry implementation for: Clinical Decision Support Agent. Primary goal: Provide real-time clinical decision support by analyzing patient vitals, lab results, and medication interactions with PHI compliance. Complexity: complex. Data sources: azuresql. PHI: yes. UX channel: web. Code capability: procode. User volume: large. Real-time: yes. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning decouples RL training from agent logic, enabling continuous optimization of agent behavior without rewriting code. This is especially valuable for multi-agent healthcare workflows where agent coordination must improve over time.",
+          "optimizationPaths": [
+            {
+              "name": "Multi-Agent Coordination RL",
+              "description": "Use Lightning's decoupled RL to train coordination policies across agents without modifying individual agent code. Agents learn optimal handoff timing, task allocation, and escalation patterns."
+            },
+            {
+              "name": "Autonomous Decision Optimization",
+              "description": "Lightning enables reward shaping for autonomous agents \u2014 define clinical accuracy, latency, and safety reward signals, then let the RL trainer optimize decision boundaries independently."
+            }
+          ],
+          "trainingStrategy": "Offline RL with logged interaction data. Lightning separates the training loop from the serving loop, so agent behavior improves from historical data without production code changes."
+        },
         "whyThisArchitecture": "PHI/HIPAA compliance required for accessing patient vitals and lab results. Real-time clinical decision support with autonomous action recommendations requires Foundry's compliance boundary, content safety, and low-latency processing (Microsoft Learn: Foundry Agent Service standard setup). Only Foundry provides the BAA coverage needed.",
         "alternativeConsidered": "All non-Foundry architectures are blocked by PHI hard-cap enforcement. Patient clinical data cannot be processed outside the Foundry compliance boundary."
       },
@@ -5483,6 +5659,18 @@
           "Deploy with multi-agent orchestration if needed"
         ],
         "implementationPrompt": "Build a Copilot + Azure AI Foundry implementation for: Multi-Agent Care Coordinator. Primary goal: Orchestrate multiple specialized agents (scheduling, medication, referral, follow-up) to coordinate patient care across departments. Complexity: multiagent. Data sources: azuresql. PHI: yes. UX channel: web. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning decouples RL training from agent logic, enabling continuous optimization of agent behavior without rewriting code. This is especially valuable for multi-agent healthcare workflows where agent coordination must improve over time.",
+          "optimizationPaths": [
+            {
+              "name": "Multi-Agent Coordination RL",
+              "description": "Use Lightning's decoupled RL to train coordination policies across agents without modifying individual agent code. Agents learn optimal handoff timing, task allocation, and escalation patterns."
+            }
+          ],
+          "trainingStrategy": "Offline RL with logged interaction data. Lightning separates the training loop from the serving loop, so agent behavior improves from historical data without production code changes."
+        },
         "whyThisArchitecture": "Multi-agent orchestration with PHI data requires Azure AI Foundry's connected agents capability (Microsoft Learn: Build collaborative multi-agent systems with Connected Agents). Each sub-agent handles a specific care coordination task while the primary agent manages routing. PHI compliance + multi-agent = Foundry only.",
         "alternativeConsidered": "No alternative supports both multi-agent orchestration AND PHI/HIPAA compliance. Copilot Studio and Agent Builder lack multi-agent capabilities; Fabric Agent lacks PHI compliance."
       },
@@ -5624,6 +5812,22 @@
           "Deploy with multi-agent orchestration if needed"
         ],
         "implementationPrompt": "Build a Copilot + Azure AI Foundry implementation for: Radiology Report Analyzer. Primary goal: Analyze radiology reports to flag critical findings, suggest follow-up imaging, and prioritize radiologist review queue. Complexity: complex. Data sources: azuresql. PHI: yes. UX channel: api. Code capability: procode. User volume: large. Real-time: yes. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning decouples RL training from agent logic, enabling continuous optimization of agent behavior without rewriting code. This is especially valuable for multi-agent healthcare workflows where agent coordination must improve over time.",
+          "optimizationPaths": [
+            {
+              "name": "Multi-Agent Coordination RL",
+              "description": "Use Lightning's decoupled RL to train coordination policies across agents without modifying individual agent code. Agents learn optimal handoff timing, task allocation, and escalation patterns."
+            },
+            {
+              "name": "Autonomous Decision Optimization",
+              "description": "Lightning enables reward shaping for autonomous agents \u2014 define clinical accuracy, latency, and safety reward signals, then let the RL trainer optimize decision boundaries independently."
+            }
+          ],
+          "trainingStrategy": "Offline RL with logged interaction data. Lightning separates the training loop from the serving loop, so agent behavior improves from historical data without production code changes."
+        },
         "whyThisArchitecture": "PHI/HIPAA compliance required for radiology reports containing patient data. Autonomous prioritization of critical findings requires Foundry's content safety and audit controls. API integration with PACS/RIS systems requires Foundry's enterprise connectivity (Microsoft Learn: Baseline Foundry Chat Reference Architecture).",
         "alternativeConsidered": "All non-Foundry architectures are blocked by PHI hard-cap. Radiology reports contain Protected Health Information that cannot be processed outside Foundry's compliance boundary."
       },
@@ -5764,6 +5968,22 @@
           "Deploy with multi-agent orchestration if needed"
         ],
         "implementationPrompt": "Build a Copilot + Azure AI Foundry implementation for: Clinical Trial Patient Matcher. Primary goal: Match patients to active clinical trials based on diagnosis, demographics, and lab values with PHI-compliant processing. Complexity: complex. Data sources: azuresql. PHI: yes. UX channel: web. Code capability: procode. User volume: medium. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning decouples RL training from agent logic, enabling continuous optimization of agent behavior without rewriting code. This is especially valuable for multi-agent healthcare workflows where agent coordination must improve over time.",
+          "optimizationPaths": [
+            {
+              "name": "Multi-Agent Coordination RL",
+              "description": "Use Lightning's decoupled RL to train coordination policies across agents without modifying individual agent code. Agents learn optimal handoff timing, task allocation, and escalation patterns."
+            },
+            {
+              "name": "Autonomous Decision Optimization",
+              "description": "Lightning enables reward shaping for autonomous agents \u2014 define clinical accuracy, latency, and safety reward signals, then let the RL trainer optimize decision boundaries independently."
+            }
+          ],
+          "trainingStrategy": "Offline RL with logged interaction data. Lightning separates the training loop from the serving loop, so agent behavior improves from historical data without production code changes."
+        },
         "whyThisArchitecture": "PHI/HIPAA compliance required \u2014 matching patients to trials requires accessing diagnosis codes, lab values, and demographics (all PHI). Foundry's BAA coverage and audit trail ensure compliant patient-trial matching (Microsoft Learn: Foundry Agent Service overview). Autonomous matching with clinician review.",
         "alternativeConsidered": "All non-Foundry architectures are blocked by PHI hard-cap. Patient matching requires access to Protected Health Information that cannot leave the Foundry compliance boundary."
       },
@@ -5906,6 +6126,22 @@
           "Deploy with multi-agent orchestration if needed"
         ],
         "implementationPrompt": "Build a Copilot + Azure AI Foundry implementation for: Medication Interaction Checker. Primary goal: Autonomously check prescribed medications against patient's current medication list and flag dangerous interactions in real-time. Complexity: complex. Data sources: azuresql. PHI: yes. UX channel: api. Code capability: procode. User volume: enterprise. Real-time: yes. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning decouples RL training from agent logic, enabling continuous optimization of agent behavior without rewriting code. This is especially valuable for multi-agent healthcare workflows where agent coordination must improve over time.",
+          "optimizationPaths": [
+            {
+              "name": "Multi-Agent Coordination RL",
+              "description": "Use Lightning's decoupled RL to train coordination policies across agents without modifying individual agent code. Agents learn optimal handoff timing, task allocation, and escalation patterns."
+            },
+            {
+              "name": "Autonomous Decision Optimization",
+              "description": "Lightning enables reward shaping for autonomous agents \u2014 define clinical accuracy, latency, and safety reward signals, then let the RL trainer optimize decision boundaries independently."
+            }
+          ],
+          "trainingStrategy": "Offline RL with logged interaction data. Lightning separates the training loop from the serving loop, so agent behavior improves from historical data without production code changes."
+        },
         "whyThisArchitecture": "PHI/HIPAA compliance required for accessing patient medication lists. Real-time autonomous interaction checking with patient data requires Foundry's compliance boundary and content safety controls. API integration with EHR/pharmacy systems (Microsoft Learn: Foundry Agent Service standard setup).",
         "alternativeConsidered": "All non-Foundry architectures are blocked by PHI hard-cap. Medication data is Protected Health Information requiring Foundry's BAA coverage."
       },
@@ -6046,6 +6282,22 @@
           "Deploy with multi-agent orchestration if needed"
         ],
         "implementationPrompt": "Build a Copilot + Azure AI Foundry implementation for: Prior Authorization Automation Agent. Primary goal: Automate insurance prior authorization submissions by extracting clinical justification from patient records and submitting to payers. Complexity: complex. Data sources: azuresql. PHI: yes. UX channel: web. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning decouples RL training from agent logic, enabling continuous optimization of agent behavior without rewriting code. This is especially valuable for multi-agent healthcare workflows where agent coordination must improve over time.",
+          "optimizationPaths": [
+            {
+              "name": "Multi-Agent Coordination RL",
+              "description": "Use Lightning's decoupled RL to train coordination policies across agents without modifying individual agent code. Agents learn optimal handoff timing, task allocation, and escalation patterns."
+            },
+            {
+              "name": "Autonomous Decision Optimization",
+              "description": "Lightning enables reward shaping for autonomous agents \u2014 define clinical accuracy, latency, and safety reward signals, then let the RL trainer optimize decision boundaries independently."
+            }
+          ],
+          "trainingStrategy": "Offline RL with logged interaction data. Lightning separates the training loop from the serving loop, so agent behavior improves from historical data without production code changes."
+        },
         "whyThisArchitecture": "PHI/HIPAA compliance required \u2014 prior auth requires extracting clinical data from patient records. Autonomous submission to payer portals requires Foundry's enterprise API connectivity and compliance controls. Only Foundry can process PHI while taking autonomous external actions (Microsoft Learn: Foundry Agent Service overview).",
         "alternativeConsidered": "Copilot Studio could handle simple form-filling but cannot access PHI data or make autonomous payer API submissions. Foundry's compliance boundary is required."
       },
@@ -6188,6 +6440,22 @@
           "Deploy with multi-agent orchestration if needed"
         ],
         "implementationPrompt": "Build a Copilot + Azure AI Foundry implementation for: Sepsis Early Warning System. Primary goal: Monitor patient vitals in real-time and autonomously alert care teams when sepsis risk indicators are detected. Complexity: complex. Data sources: azuresql. PHI: yes. UX channel: api. Code capability: procode. User volume: enterprise. Real-time: yes. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning decouples RL training from agent logic, enabling continuous optimization of agent behavior without rewriting code. This is especially valuable for multi-agent healthcare workflows where agent coordination must improve over time.",
+          "optimizationPaths": [
+            {
+              "name": "Multi-Agent Coordination RL",
+              "description": "Use Lightning's decoupled RL to train coordination policies across agents without modifying individual agent code. Agents learn optimal handoff timing, task allocation, and escalation patterns."
+            },
+            {
+              "name": "Autonomous Decision Optimization",
+              "description": "Lightning enables reward shaping for autonomous agents \u2014 define clinical accuracy, latency, and safety reward signals, then let the RL trainer optimize decision boundaries independently."
+            }
+          ],
+          "trainingStrategy": "Offline RL with logged interaction data. Lightning separates the training loop from the serving loop, so agent behavior improves from historical data without production code changes."
+        },
         "whyThisArchitecture": "PHI/HIPAA compliance required for real-time patient vital monitoring. Autonomous alerting based on clinical indicators requires Foundry's content safety and audit controls. Enterprise-scale real-time processing of PHI data (Microsoft Learn: Baseline Foundry Chat Reference Architecture).",
         "alternativeConsidered": "All non-Foundry architectures are blocked by PHI hard-cap. Real-time patient monitoring data is Protected Health Information requiring Foundry's compliance boundary."
       },
@@ -6329,6 +6597,18 @@
           "Deploy with multi-agent orchestration if needed"
         ],
         "implementationPrompt": "Build a Copilot + Azure AI Foundry implementation for: Multi-Agent Revenue Integrity Auditor. Primary goal: Orchestrate coding, billing, and compliance agents to audit charge capture accuracy and identify revenue leakage with PHI access. Complexity: multiagent. Data sources: azuresql. PHI: yes. UX channel: web. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning decouples RL training from agent logic, enabling continuous optimization of agent behavior without rewriting code. This is especially valuable for multi-agent healthcare workflows where agent coordination must improve over time.",
+          "optimizationPaths": [
+            {
+              "name": "Multi-Agent Coordination RL",
+              "description": "Use Lightning's decoupled RL to train coordination policies across agents without modifying individual agent code. Agents learn optimal handoff timing, task allocation, and escalation patterns."
+            }
+          ],
+          "trainingStrategy": "Offline RL with logged interaction data. Lightning separates the training loop from the serving loop, so agent behavior improves from historical data without production code changes."
+        },
         "whyThisArchitecture": "Multi-agent orchestration with PHI data. Coding agent validates CPT/ICD codes, billing agent checks charge capture, compliance agent flags audit risks. Foundry's Connected Agents feature enables this coordination (Microsoft Learn: Connected Agents in Foundry). PHI + multi-agent = Foundry only.",
         "alternativeConsidered": "No alternative supports both multi-agent orchestration AND PHI compliance. Each sub-agent needs access to patient billing records containing PHI."
       },
@@ -6469,6 +6749,26 @@
           "Deploy with multi-agent orchestration if needed"
         ],
         "implementationPrompt": "Build a Copilot + Azure AI Foundry implementation for: Pathology Report NLP Extractor. Primary goal: Extract structured data (tumor staging, margins, biomarkers) from unstructured pathology reports using fine-tuned clinical NLP models. Complexity: complex. Data sources: azuresql. PHI: yes. UX channel: api. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning decouples RL training from agent logic, enabling continuous optimization of agent behavior without rewriting code. This is especially valuable for multi-agent healthcare workflows where agent coordination must improve over time.",
+          "optimizationPaths": [
+            {
+              "name": "Multi-Agent Coordination RL",
+              "description": "Use Lightning's decoupled RL to train coordination policies across agents without modifying individual agent code. Agents learn optimal handoff timing, task allocation, and escalation patterns."
+            },
+            {
+              "name": "Autonomous Decision Optimization",
+              "description": "Lightning enables reward shaping for autonomous agents \u2014 define clinical accuracy, latency, and safety reward signals, then let the RL trainer optimize decision boundaries independently."
+            },
+            {
+              "name": "Fine-Tuned Model Alignment",
+              "description": "Use Lightning's RLHF pipeline to align fine-tuned models with clinical workflow requirements. The decoupled architecture means model alignment training runs independently of serving infrastructure."
+            }
+          ],
+          "trainingStrategy": "Offline RL with logged interaction data. Lightning separates the training loop from the serving loop, so agent behavior improves from historical data without production code changes."
+        },
         "whyThisArchitecture": "Triple requirement: PHI/HIPAA compliance + fine-tuned clinical NLP model + autonomous extraction. Only Azure AI Foundry supports all three: BAA coverage for pathology data, custom model hosting for domain-specific NLP, and autonomous processing pipeline (Microsoft Learn: Foundry Agent Service overview). Fine-tuned model deployment requires Foundry infrastructure.",
         "alternativeConsidered": "No alternative supports fine-tuned model deployment. Additionally, pathology reports contain PHI, which blocks all non-Foundry architectures via hard-cap enforcement."
       },
@@ -6610,6 +6910,22 @@
           "Deploy with multi-agent orchestration if needed"
         ],
         "implementationPrompt": "Build a Copilot + Azure AI Foundry implementation for: Patient Risk Stratification Engine. Primary goal: Stratify patients by readmission risk using clinical history, social determinants, and lab trends with PHI-compliant ML models. Complexity: complex. Data sources: azuresql. PHI: yes. UX channel: web. Code capability: procode. User volume: enterprise. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning decouples RL training from agent logic, enabling continuous optimization of agent behavior without rewriting code. This is especially valuable for multi-agent healthcare workflows where agent coordination must improve over time.",
+          "optimizationPaths": [
+            {
+              "name": "Multi-Agent Coordination RL",
+              "description": "Use Lightning's decoupled RL to train coordination policies across agents without modifying individual agent code. Agents learn optimal handoff timing, task allocation, and escalation patterns."
+            },
+            {
+              "name": "Autonomous Decision Optimization",
+              "description": "Lightning enables reward shaping for autonomous agents \u2014 define clinical accuracy, latency, and safety reward signals, then let the RL trainer optimize decision boundaries independently."
+            }
+          ],
+          "trainingStrategy": "Offline RL with logged interaction data. Lightning separates the training loop from the serving loop, so agent behavior improves from historical data without production code changes."
+        },
         "whyThisArchitecture": "PHI/HIPAA compliance required for patient-level risk stratification using clinical history and social determinants. Enterprise-scale ML inference with autonomous risk scoring requires Foundry's compliance boundary and model hosting (Microsoft Learn: Baseline Foundry Chat Reference Architecture).",
         "alternativeConsidered": "All non-Foundry architectures are blocked by PHI hard-cap. Patient clinical history is Protected Health Information requiring Foundry's BAA coverage."
       },
@@ -6751,6 +7067,18 @@
           "Deploy with multi-agent orchestration if needed"
         ],
         "implementationPrompt": "Build a Copilot + Azure AI Foundry implementation for: Multi-Agent Referral Coordinator. Primary goal: Orchestrate intake, eligibility, scheduling, and notification agents to automate the specialist referral process end-to-end with PHI. Complexity: multiagent. Data sources: azuresql. PHI: yes. UX channel: web. Code capability: procode. User volume: large. Real-time: no. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning decouples RL training from agent logic, enabling continuous optimization of agent behavior without rewriting code. This is especially valuable for multi-agent healthcare workflows where agent coordination must improve over time.",
+          "optimizationPaths": [
+            {
+              "name": "Multi-Agent Coordination RL",
+              "description": "Use Lightning's decoupled RL to train coordination policies across agents without modifying individual agent code. Agents learn optimal handoff timing, task allocation, and escalation patterns."
+            }
+          ],
+          "trainingStrategy": "Offline RL with logged interaction data. Lightning separates the training loop from the serving loop, so agent behavior improves from historical data without production code changes."
+        },
         "whyThisArchitecture": "Multi-agent orchestration with PHI data for referral management. Intake agent processes referral, eligibility agent checks insurance, scheduling agent finds slots, notification agent confirms. Foundry's Connected Agents enables this pipeline (Microsoft Learn: Connected Agents in Foundry). PHI + multi-agent = Foundry only.",
         "alternativeConsidered": "Copilot Studio could handle simple referral forms but cannot orchestrate multiple agents or process PHI data. Foundry is required for both capabilities."
       },
@@ -6893,6 +7221,22 @@
           "Deploy with multi-agent orchestration if needed"
         ],
         "implementationPrompt": "Build a Copilot + Azure AI Foundry implementation for: Adverse Event Detection & Reporting. Primary goal: Autonomously monitor clinical data streams for adverse events, classify severity, and generate FDA-compliant reports with PHI data. Complexity: complex. Data sources: azuresql. PHI: yes. UX channel: api. Code capability: procode. User volume: enterprise. Real-time: yes. Team size: large.",
+        "aiLightning": {
+          "applicable": true,
+          "framework": "Microsoft AI Lightning (MS Research)",
+          "summary": "AI Lightning decouples RL training from agent logic, enabling continuous optimization of agent behavior without rewriting code. This is especially valuable for multi-agent healthcare workflows where agent coordination must improve over time.",
+          "optimizationPaths": [
+            {
+              "name": "Multi-Agent Coordination RL",
+              "description": "Use Lightning's decoupled RL to train coordination policies across agents without modifying individual agent code. Agents learn optimal handoff timing, task allocation, and escalation patterns."
+            },
+            {
+              "name": "Autonomous Decision Optimization",
+              "description": "Lightning enables reward shaping for autonomous agents \u2014 define clinical accuracy, latency, and safety reward signals, then let the RL trainer optimize decision boundaries independently."
+            }
+          ],
+          "trainingStrategy": "Offline RL with logged interaction data. Lightning separates the training loop from the serving loop, so agent behavior improves from historical data without production code changes."
+        },
         "whyThisArchitecture": "PHI/HIPAA compliance required for clinical adverse event monitoring. Autonomous detection and FDA reporting from patient data streams requires Foundry's compliance boundary, content safety, and enterprise API connectivity (Microsoft Learn: Foundry Agent Service standard setup). Real-time processing of PHI clinical data.",
         "alternativeConsidered": "All non-Foundry architectures are blocked by PHI hard-cap. Adverse event data contains Protected Health Information and requires Foundry's audit trail for FDA reporting."
       },

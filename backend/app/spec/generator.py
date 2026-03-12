@@ -38,6 +38,11 @@ def generate_spec(answers: dict, ranked: list[dict]) -> dict:
         "implementationPrompt": _generate_implementation_prompt(answers, primary_id, primary_label),
     }
 
+    # Add AI Lightning optimization insights for applicable architectures
+    lightning = _get_ai_lightning_insights(answers, primary_id)
+    if lightning:
+        spec["aiLightning"] = lightning
+
     return spec
 
 
@@ -184,6 +189,112 @@ def _get_next_steps(arch_id: str) -> list[str]:
         ],
     }
     return steps_map.get(arch_id, [])
+
+
+def _get_ai_lightning_insights(answers: dict, arch_id: str) -> dict | None:
+    """Generate Microsoft AI Lightning optimization insights.
+
+    Microsoft AI Lightning (from MS Research) decouples reinforcement learning
+    training from agent logic, enabling agent optimization without code rewrites.
+    This is most relevant for Foundry multi-agent scenarios but also applies to
+    complex Fabric and Agent Builder patterns.
+    """
+    complexity = answers.get("complexity", "simple")
+    agent_behavior = answers.get("agentBehavior", "")
+    custom_model = answers.get("customModel", "no")
+
+    # AI Lightning is most relevant for complex/multi-agent Foundry scenarios
+    if arch_id == "FOUNDRY_AGENT":
+        insights: dict = {
+            "applicable": True,
+            "framework": "Microsoft AI Lightning (MS Research)",
+            "summary": (
+                "AI Lightning decouples RL training from agent logic, enabling "
+                "continuous optimization of agent behavior without rewriting code. "
+                "This is especially valuable for multi-agent healthcare workflows "
+                "where agent coordination must improve over time."
+            ),
+            "optimizationPaths": [],
+            "trainingStrategy": "",
+        }
+
+        if complexity in ("multiagent", "complex"):
+            insights["optimizationPaths"].append({
+                "name": "Multi-Agent Coordination RL",
+                "description": (
+                    "Use Lightning's decoupled RL to train coordination policies "
+                    "across agents without modifying individual agent code. Agents "
+                    "learn optimal handoff timing, task allocation, and escalation patterns."
+                ),
+            })
+            insights["trainingStrategy"] = (
+                "Offline RL with logged interaction data. Lightning separates the "
+                "training loop from the serving loop, so agent behavior improves "
+                "from historical data without production code changes."
+            )
+
+        if agent_behavior == "autonomous":
+            insights["optimizationPaths"].append({
+                "name": "Autonomous Decision Optimization",
+                "description": (
+                    "Lightning enables reward shaping for autonomous agents — "
+                    "define clinical accuracy, latency, and safety reward signals, "
+                    "then let the RL trainer optimize decision boundaries independently."
+                ),
+            })
+
+        if custom_model != "no":
+            insights["optimizationPaths"].append({
+                "name": "Fine-Tuned Model Alignment",
+                "description": (
+                    "Use Lightning's RLHF pipeline to align fine-tuned models with "
+                    "clinical workflow requirements. The decoupled architecture means "
+                    "model alignment training runs independently of serving infrastructure."
+                ),
+            })
+
+        # Default path for all Foundry cases
+        if not insights["optimizationPaths"]:
+            insights["optimizationPaths"].append({
+                "name": "Agent Performance Monitoring",
+                "description": (
+                    "Lightning provides a framework for tracking agent performance "
+                    "metrics and identifying optimization opportunities through "
+                    "reinforcement learning signals."
+                ),
+            })
+            insights["trainingStrategy"] = (
+                "Start with supervised monitoring, then transition to RL-based "
+                "optimization as interaction data accumulates."
+            )
+
+        return insights
+
+    # Fabric Agent with complex analytics can benefit from Lightning
+    if arch_id == "FABRIC_AGENT" and complexity in ("complex", "multiagent"):
+        return {
+            "applicable": True,
+            "framework": "Microsoft AI Lightning (MS Research)",
+            "summary": (
+                "AI Lightning can optimize Fabric Data Agent query routing and "
+                "data pipeline orchestration through reinforcement learning, "
+                "improving response accuracy and latency over time."
+            ),
+            "optimizationPaths": [{
+                "name": "Query Routing Optimization",
+                "description": (
+                    "Use RL to learn optimal query routing across Fabric "
+                    "lakehouse tables, reducing latency and improving result relevance."
+                ),
+            }],
+            "trainingStrategy": (
+                "Collect query performance metrics, then use Lightning's offline "
+                "RL to train routing policies without modifying the data agent code."
+            ),
+        }
+
+    # Not applicable for simpler architectures
+    return None
 
 
 def _generate_implementation_prompt(answers: dict, arch_id: str, arch_label: str) -> str:
